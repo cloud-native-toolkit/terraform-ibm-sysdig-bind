@@ -9,11 +9,23 @@ locals {
   cluster_type      = data.local_file.cluster_type.content
 }
 
+resource null_resource print_names {
+  provisioner "local-exec" {
+    command = "echo 'Resource group: ${var.resource_group_name}'"
+  }
+  provisioner "local-exec" {
+    command = "echo 'Sysdig instance: ${var.name}'"
+  }
+}
+
 data "ibm_resource_group" "tools_resource_group" {
+  depends_on = [null_resource.print_names]
+
   name = var.resource_group_name
 }
 
 data "ibm_resource_instance" "sysdig_instance" {
+  depends_on = [null_resource.print_names]
   count             = local.bind ? 1 : 0
 
   name              = local.name
