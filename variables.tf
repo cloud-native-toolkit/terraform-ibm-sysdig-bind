@@ -1,16 +1,17 @@
-variable "resource_group_name" {
-  type        = string
-  description = "Existing resource group where the IKS cluster will be provisioned."
-}
 
 variable "region" {
   type        = string
   description = "Geographic location of the resource (e.g. us-south, us-east)"
 }
 
-variable "name" {
+variable "guid" {
   type        = string
-  description = "The name of the existing Sysdig instance"
+  description = "The guid of the existing Sysdig instance"
+}
+
+variable "access_key" {
+  type        = string
+  description = "The access key of the existing Sysdig instance"
 }
 
 variable "namespace" {

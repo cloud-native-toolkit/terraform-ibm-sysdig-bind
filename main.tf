@@ -1,50 +1,15 @@
 
 locals {
   tmp_dir     = "${path.cwd}/.tmp"
-  name        = var.name
   role        = "Manager"
-  bind        = var.name != "" && var.cluster_name != ""
-  access_key  = local.bind ? ibm_resource_key.sysdig_instance_key[0].credentials["Sysdig Access Key"] : ""
+  bind        = var.cluster_name != ""
   cluster_type_file = "${local.tmp_dir}/cluster_type.out"
   cluster_type      = data.local_file.cluster_type.content
 }
 
 resource null_resource print_names {
   provisioner "local-exec" {
-    command = "echo 'Resource group: ${var.resource_group_name}'"
-  }
-  provisioner "local-exec" {
-    command = "echo 'Sysdig instance: ${var.name}'"
-  }
-}
-
-data "ibm_resource_group" "tools_resource_group" {
-  depends_on = [null_resource.print_names]
-
-  name = var.resource_group_name
-}
-
-data "ibm_resource_instance" "sysdig_instance" {
-  depends_on = [null_resource.print_names]
-  count             = local.bind ? 1 : 0
-
-  name              = local.name
-  service           = "sysdig-monitor"
-  resource_group_id = data.ibm_resource_group.tools_resource_group.id
-  location          = var.region
-}
-
-resource "ibm_resource_key" "sysdig_instance_key" {
-  count = local.bind ? 1 : 0
-
-  name                 = "${local.name}-key"
-  resource_instance_id = data.ibm_resource_instance.sysdig_instance[0].id
-  role                 = local.role
-
-  //User can increase timeouts
-  timeouts {
-    create = "15m"
-    delete = "15m"
+    command = "echo 'Sysdig instance: ${var.guid}'"
   }
 }
 
@@ -60,11 +25,11 @@ resource "null_resource" "sysdig_bind" {
 
   triggers = {
     cluster_id  = var.cluster_id
-    instance_id = data.ibm_resource_instance.sysdig_instance[0].guid
+    instance_id = var.guid
   }
 
   provisioner "local-exec" {
-    command = "${path.module}/scripts/bind-instance.sh ${self.triggers.cluster_id} ${self.triggers.instance_id} ${local.access_key} ${var.private_endpoint}"
+    command = "${path.module}/scripts/bind-instance.sh ${self.triggers.cluster_id} ${self.triggers.instance_id} ${var.access_key} ${var.private_endpoint}"
 
     environment = {
       SYNC = var.sync

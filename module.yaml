@@ -25,6 +25,10 @@ versions:
       refs:
         - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
           version: ">= 2.1.0"
+    - id: sysdig
+      refs:
+        - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
+          version: ">= 1.0.0"
   variables:
     - name: cluster_id
       moduleRef:
@@ -43,11 +47,15 @@ versions:
         id: namespace
         output: name
         discriminator: tools
-    - name: resource_group_name
-      moduleRef:
-        id: resource_group
-        output: name
     - name: region
       scope: global
     - name: private_endpoint
       scope: global
+    - name: guid
+      moduleRef:
+        id: sysdig
+        output: guid
+    - name: access_key
+      moduleRef:
+        id: sysdig
+        output: access_key
