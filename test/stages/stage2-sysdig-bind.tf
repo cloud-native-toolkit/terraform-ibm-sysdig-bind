@@ -8,5 +8,5 @@ module "sysdig-bind" {
   cluster_id               = module.dev_cluster.id
   cluster_config_file_path = module.dev_cluster.config_file_path
   tools_namespace          = module.dev_capture_state.namespace
-  private_endpoints        = "false"
+  private_endpoint         = "false"
 }
