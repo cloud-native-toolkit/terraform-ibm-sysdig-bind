@@ -1,4 +1,14 @@
 
+variable "ibmcloud_api_key" {
+  type        = string
+  description = "Geographic location of the resource (e.g. us-south, us-east)"
+}
+
+variable "resource_group_name" {
+  type        = string
+  description = "Geographic location of the resource (e.g. us-south, us-east)"
+}
+
 variable "region" {
   type        = string
   description = "Geographic location of the resource (e.g. us-south, us-east)"

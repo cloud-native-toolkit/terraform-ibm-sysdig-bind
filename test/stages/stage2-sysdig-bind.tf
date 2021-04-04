@@ -1,6 +1,7 @@
 module "sysdig-bind" {
   source = "./module"
 
+  resource_group_name      = module.resource_group.name
   region                   = var.region
   guid                     = module.dev_sysdig.guid
   access_key               = module.dev_sysdig.access_key
