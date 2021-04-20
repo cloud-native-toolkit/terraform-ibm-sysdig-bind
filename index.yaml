@@ -14,6 +14,107 @@ versions:
     dependencies:
       - id: cluster
         refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
+            version: ">= 1.7.0"
+          - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
+            version: ">= 2.0.0"
+          - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
+            version: ">= 1.0.0"
+      - id: namespace
+        refs:
+          - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
+            version: ">= 2.1.0"
+      - id: resource_group
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
+            version: ">= 2.1.0"
+      - id: sysdig
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
+            version: ">= 1.0.0"
+    variables:
+      - name: cluster_id
+        moduleRef:
+          id: cluster
+          output: id
+        type: string
+        description: The id of the cluster into which the sysdig instance should be bound
+        default: ""
+        optional: true
+      - name: cluster_name
+        moduleRef:
+          id: cluster
+          output: name
+        type: string
+        description: The name of the cluster into which the sysdig instance should be bound
+        default: ""
+        optional: true
+      - name: cluster_config_file_path
+        moduleRef:
+          id: cluster
+          output: config_file_path
+        type: string
+        description: The path to the config file for the cluster
+        default: ""
+        optional: true
+      - name: tools_namespace
+        moduleRef:
+          id: namespace
+          output: name
+          discriminator: tools
+        type: string
+        description: The namespace where the tools have been deployed (where the configmap should be created)
+        default: default
+        optional: true
+      - name: region
+        scope: global
+        type: string
+        description: Geographic location of the resource (e.g. us-south, us-east)
+      - name: private_endpoint
+        scope: global
+        type: string
+        description: Flag indicating that the agent should be created with private endpoints
+        default: "true"
+        optional: true
+      - name: guid
+        moduleRef:
+          id: sysdig
+          output: guid
+        type: string
+        description: The guid of the existing Sysdig instance
+      - name: access_key
+        moduleRef:
+          id: sysdig
+          output: access_key
+        type: string
+        description: The access key of the existing Sysdig instance
+      - name: ibmcloud_api_key
+        type: string
+        description: Geographic location of the resource (e.g. us-south, us-east)
+      - name: resource_group_name
+        type: string
+        description: Geographic location of the resource (e.g. us-south, us-east)
+      - name: namespace
+        type: string
+        description: The namespace where the agent should be deployed
+        default: ibm-observe
+        optional: true
+      - name: sync
+        type: string
+        description: Semaphore value to sync up modules
+        default: ""
+        optional: true
+    version: v1.0.1
+    outputs:
+      - name: sync
+        description: output "sync" {   value = "sysdig"   depends_on = [helm_release.sysdig] }
+  - platforms:
+      - kubernetes
+      - ocp3
+      - ocp4
+    dependencies:
+      - id: cluster
+        refs:
           - source: github.com/ibm-garage-cloud/terraform-ibm-container-platform
             version: ">= 1.7.0"
           - source: github.com/ibm-garage-cloud/terraform-k8s-ocp-cluster
