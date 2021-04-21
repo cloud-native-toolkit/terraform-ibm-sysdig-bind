@@ -32,6 +32,10 @@ versions:
         - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
           version: ">= 1.0.0"
   variables:
+    - name: resource_group_name
+      moduleRef:
+        id: resource_group
+        output: name
     - name: cluster_id
       moduleRef:
         id: cluster
@@ -61,3 +65,5 @@ versions:
       moduleRef:
         id: sysdig
         output: access_key
+    - name: ibmcloud_api_key
+      scope: global
