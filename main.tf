@@ -7,19 +7,24 @@ locals {
   cluster_type      = data.local_file.cluster_type.content
 }
 
+resource null_resource print_names {
+  provisioner "local-exec" {
+    command = "echo 'Resource group name: ${var.resource_group_name}'"
+  }
+  provisioner "local-exec" {
+    command = "echo 'Sysdig instance: ${var.guid}'"
+  }
+}
+
 resource null_resource ibmcloud_login {
+  depends_on = [null_resource.print_names]
+
   provisioner "local-exec" {
     command = "${path.module}/scripts/ibmcloud-login.sh ${var.region} ${var.resource_group_name}"
 
     environment = {
       APIKEY = var.ibmcloud_api_key
     }
-  }
-}
-
-resource null_resource print_names {
-  provisioner "local-exec" {
-    command = "echo 'Sysdig instance: ${var.guid}'"
   }
 }
 
@@ -31,7 +36,7 @@ resource "null_resource" "setup-ob-plugin" {
 
 resource "null_resource" "sysdig_bind" {
   count = local.bind ? 1 : 0
-  depends_on = [null_resource.setup-ob-plugin, null_resource.ibmcloud_login]
+  depends_on = [null_resource.setup-ob-plugin, null_resource.ibmcloud_login, null_resource.print_names]
 
   triggers = {
     cluster_id  = var.cluster_id
