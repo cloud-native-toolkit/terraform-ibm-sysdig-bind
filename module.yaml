@@ -47,7 +47,7 @@ versions:
     - name: cluster_config_file_path
       moduleRef:
         id: cluster
-        output: config_file_path
+        output: platform.kubeconfig
     - name: tools_namespace
       moduleRef:
         id: namespace
