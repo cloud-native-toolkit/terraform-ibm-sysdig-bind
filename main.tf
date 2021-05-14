@@ -36,6 +36,7 @@ resource "null_resource" "sysdig_bind" {
   triggers = {
     cluster_id  = var.cluster_id
     instance_id = var.guid
+    kubeconfig  = var.cluster_config_file_path
   }
 
   provisioner "local-exec" {
@@ -43,12 +44,17 @@ resource "null_resource" "sysdig_bind" {
 
     environment = {
       SYNC = var.sync
+      KUBECONFIG = self.triggers.kubeconfig
     }
   }
 
   provisioner "local-exec" {
     when    = destroy
     command = "${path.module}/scripts/unbind-instance.sh ${self.triggers.cluster_id} ${self.triggers.instance_id}"
+
+    environment = {
+      KUBECONFIG = self.triggers.kubeconfig
+    }
   }
 }
 
@@ -104,7 +110,7 @@ resource "helm_release" "sysdig" {
 
   set {
     name  = "displayName"
-    value = "Sysdig"
+    value = "IBM Monitoring"
   }
 
   set {
