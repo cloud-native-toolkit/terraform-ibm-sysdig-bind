@@ -1,4 +1,4 @@
 output "sync" {
   value = "sysdig"
-  depends_on = [helm_release.sysdig]
+  depends_on = [null_resource.sysdig_bind]
 }

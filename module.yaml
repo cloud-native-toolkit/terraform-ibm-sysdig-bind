@@ -44,15 +44,6 @@ versions:
       moduleRef:
         id: cluster
         output: name
-    - name: cluster_config_file_path
-      moduleRef:
-        id: cluster
-        output: platform.kubeconfig
-    - name: tools_namespace
-      moduleRef:
-        id: namespace
-        output: name
-        discriminator: tools
     - name: region
       scope: global
     - name: private_endpoint
