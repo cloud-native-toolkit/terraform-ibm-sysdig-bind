@@ -101,7 +101,7 @@ resource "helm_release" "sysdig" {
   name              = "sysdig"
   chart             = "tool-config"
   namespace         = var.tools_namespace
-  repository        = "https://ibm-garage-cloud.github.io/toolkit-charts/"
+  repository        = "https://charts.cloudnativetoolkit.dev/"
   timeout           = 1200
   force_update      = true
   replace           = true
