@@ -9,4 +9,5 @@ INSTANCE_ID="$2"
 ibmcloud ob monitoring config delete \
   --cluster "${CLUSTER_ID}" \
   --instance "${INSTANCE_ID}" \
-  --force
+  --force || \
+  echo "Error deleting monitoring instance from cluster"
