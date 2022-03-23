@@ -3,6 +3,6 @@ module "dev_sysdig" {
 
   resource_group_name      = module.resource_group.name
   region                   = var.region
-  provision                = false
+  provision                = true
   name_prefix              = var.name_prefix
 }
