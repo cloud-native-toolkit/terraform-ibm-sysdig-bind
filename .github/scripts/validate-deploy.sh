@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 export KUBECONFIG=$(cat ./kubeconfig)
+BIN_DIR=$(cat .bin_dir)
+
+export PATH="${BIN_DIR}:${PATH}"
 
 kubectl get daemonset -n ibm-observe
 
