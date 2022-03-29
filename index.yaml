@@ -1,11 +1,12 @@
-id: github.com/cloud-native-toolkit/terraform-ibm-sysdig-bind
-name: sysdig-bind
+id: github.com/cloud-native-toolkit/terraform-ibm-cloud-monitoring-bind
+name: ibm-cloud-monitoring-bind
 type: terraform
-description: Module to bind a Sysdig instance to a cluster
+description: Module to bind an existing IBM Cloud Monitoring instance to a cluster
 tags:
   - tools
   - monitor
-  - sres
+  - sre
+  - kubernetes
 versions:
   - platforms:
       - kubernetes
@@ -18,11 +19,86 @@ versions:
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
+      - id: sysdig
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-cloud-monitoring
+            version: '>= 1.0.0'
+    variables:
+      - name: ibmcloud_api_key
+        type: string
+        description: Geographic location of the resource (e.g. us-south, us-east)
+        scope: global
+      - name: resource_group_name
+        type: string
+        description: Geographic location of the resource (e.g. us-south, us-east)
+        moduleRef:
+          id: resource_group
+          output: name
+      - name: region
+        type: string
+        description: Geographic location of the resource (e.g. us-south, us-east)
+        scope: global
+      - name: guid
+        type: string
+        description: The guid of the existing Sysdig instance
+        moduleRef:
+          id: sysdig
+          output: guid
+      - name: access_key
+        type: string
+        description: The access key of the existing Sysdig instance
+        moduleRef:
+          id: sysdig
+          output: access_key
+      - name: namespace
+        type: string
+        description: The namespace where the agent should be deployed
+        default: ibm-observe
+      - name: cluster_name
+        type: string
+        description: The name of the cluster into which the sysdig instance should be bound
+        default: ''
+        moduleRef:
+          id: cluster
+          output: name
+      - name: cluster_id
+        type: string
+        description: The id of the cluster into which the sysdig instance should be bound
+        default: ''
+        moduleRef:
+          id: cluster
+          output: id
+      - name: sync
+        type: string
+        description: Semaphore value to sync up modules
+        default: ''
+      - name: private_endpoint
+        type: string
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
+        scope: global
+    version: v1.3.1
+    outputs:
+      - name: sync
+  - platforms:
+      - kubernetes
+      - ocp3
+      - ocp4
+    dependencies:
+      - id: cluster
+        interface: github.com/cloud-native-toolkit/automation-modules#cluster
+        refs: []
+      - id: resource_group
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: resource_group_name
         moduleRef:
@@ -36,7 +112,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -44,7 +120,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: region
         scope: global
@@ -53,8 +129,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -80,12 +158,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.3.0
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [null_resource.sysdig_bind] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [null_resource.sysdig_bind] }
   - platforms:
       - kubernetes
       - ocp3
@@ -94,19 +174,19 @@ versions:
       - id: cluster
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
           - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: resource_group_name
         moduleRef:
@@ -120,7 +200,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -128,7 +208,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: region
         scope: global
@@ -137,8 +217,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -164,12 +246,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.2.3
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [null_resource.sysdig_bind] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [null_resource.sysdig_bind] }
   - platforms:
       - kubernetes
       - ocp3
@@ -178,19 +262,19 @@ versions:
       - id: cluster
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
           - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: resource_group_name
         moduleRef:
@@ -204,7 +288,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -212,7 +296,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: region
         scope: global
@@ -221,8 +305,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -248,12 +334,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.2.2
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [null_resource.sysdig_bind] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [null_resource.sysdig_bind] }
   - platforms:
       - kubernetes
       - ocp3
@@ -262,23 +350,23 @@ versions:
       - id: cluster
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
           - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: namespace
         refs:
           - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: resource_group_name
         moduleRef:
@@ -292,7 +380,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -300,7 +388,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_config_file_path
         moduleRef:
@@ -308,7 +396,7 @@ versions:
           output: platform.kubeconfig
         type: string
         description: The path to the config file for the cluster
-        default: ""
+        default: ''
         optional: true
       - name: tools_namespace
         moduleRef:
@@ -316,7 +404,9 @@ versions:
           output: name
           discriminator: tools
         type: string
-        description: The namespace where the tools have been deployed (where the configmap should be created)
+        description: >-
+          The namespace where the tools have been deployed (where the configmap
+          should be created)
         default: default
         optional: true
       - name: region
@@ -326,8 +416,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -353,12 +445,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.1.1
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [helm_release.sysdig] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [helm_release.sysdig] }
   - platforms:
       - kubernetes
       - ocp3
@@ -367,23 +461,23 @@ versions:
       - id: cluster
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
           - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: namespace
         refs:
           - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: resource_group_name
         moduleRef:
@@ -397,7 +491,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -405,7 +499,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: region
         scope: global
@@ -414,8 +508,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -441,12 +537,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.1.1
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [null_resource.sysdig_bind] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [null_resource.sysdig_bind] }
   - platforms:
       - kubernetes
       - ocp3
@@ -455,19 +553,19 @@ versions:
       - id: cluster
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
           - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: resource_group_name
         moduleRef:
@@ -481,7 +579,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -489,7 +587,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: region
         scope: global
@@ -498,8 +596,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -525,12 +625,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.2.1
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [null_resource.sysdig_bind] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [null_resource.sysdig_bind] }
   - platforms:
       - kubernetes
       - ocp3
@@ -539,23 +641,23 @@ versions:
       - id: cluster
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
           - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: namespace
         refs:
           - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: resource_group_name
         moduleRef:
@@ -569,7 +671,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -577,7 +679,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: region
         scope: global
@@ -586,8 +688,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -613,12 +717,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.1.1
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [null_resource.sysdig_bind] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [null_resource.sysdig_bind] }
   - platforms:
       - kubernetes
       - ocp3
@@ -627,23 +733,23 @@ versions:
       - id: cluster
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
           - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: namespace
         refs:
           - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: resource_group_name
         moduleRef:
@@ -657,7 +763,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -665,7 +771,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_config_file_path
         moduleRef:
@@ -673,7 +779,7 @@ versions:
           output: platform.kubeconfig
         type: string
         description: The path to the config file for the cluster
-        default: ""
+        default: ''
         optional: true
       - name: tools_namespace
         moduleRef:
@@ -681,7 +787,9 @@ versions:
           output: name
           discriminator: tools
         type: string
-        description: The namespace where the tools have been deployed (where the configmap should be created)
+        description: >-
+          The namespace where the tools have been deployed (where the configmap
+          should be created)
         default: default
         optional: true
       - name: region
@@ -691,8 +799,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -718,12 +828,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.1.0
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [helm_release.sysdig] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [helm_release.sysdig] }
   - platforms:
       - kubernetes
       - ocp3
@@ -732,23 +844,23 @@ versions:
       - id: cluster
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
           - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: namespace
         refs:
           - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: resource_group_name
         moduleRef:
@@ -762,7 +874,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -770,7 +882,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_config_file_path
         moduleRef:
@@ -778,7 +890,7 @@ versions:
           output: config_file_path
         type: string
         description: The path to the config file for the cluster
-        default: ""
+        default: ''
         optional: true
       - name: tools_namespace
         moduleRef:
@@ -786,7 +898,9 @@ versions:
           output: name
           discriminator: tools
         type: string
-        description: The namespace where the tools have been deployed (where the configmap should be created)
+        description: >-
+          The namespace where the tools have been deployed (where the configmap
+          should be created)
         default: default
         optional: true
       - name: region
@@ -796,8 +910,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -823,12 +939,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.0.4
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [helm_release.sysdig] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [helm_release.sysdig] }
   - platforms:
       - kubernetes
       - ocp3
@@ -837,23 +955,23 @@ versions:
       - id: cluster
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
           - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: namespace
         refs:
           - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: resource_group_name
         moduleRef:
@@ -867,7 +985,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -875,7 +993,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_config_file_path
         moduleRef:
@@ -883,7 +1001,7 @@ versions:
           output: config_file_path
         type: string
         description: The path to the config file for the cluster
-        default: ""
+        default: ''
         optional: true
       - name: tools_namespace
         moduleRef:
@@ -891,7 +1009,9 @@ versions:
           output: name
           discriminator: tools
         type: string
-        description: The namespace where the tools have been deployed (where the configmap should be created)
+        description: >-
+          The namespace where the tools have been deployed (where the configmap
+          should be created)
         default: default
         optional: true
       - name: region
@@ -901,8 +1021,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -928,12 +1050,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.0.3
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [helm_release.sysdig] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [helm_release.sysdig] }
   - platforms:
       - kubernetes
       - ocp3
@@ -942,23 +1066,23 @@ versions:
       - id: cluster
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
           - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: namespace
         refs:
           - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: cluster_id
         moduleRef:
@@ -966,7 +1090,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -974,7 +1098,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_config_file_path
         moduleRef:
@@ -982,7 +1106,7 @@ versions:
           output: config_file_path
         type: string
         description: The path to the config file for the cluster
-        default: ""
+        default: ''
         optional: true
       - name: tools_namespace
         moduleRef:
@@ -990,7 +1114,9 @@ versions:
           output: name
           discriminator: tools
         type: string
-        description: The namespace where the tools have been deployed (where the configmap should be created)
+        description: >-
+          The namespace where the tools have been deployed (where the configmap
+          should be created)
         default: default
         optional: true
       - name: region
@@ -1000,8 +1126,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -1029,12 +1157,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.0.2
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [helm_release.sysdig] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [helm_release.sysdig] }
   - platforms:
       - kubernetes
       - ocp3
@@ -1043,23 +1173,23 @@ versions:
       - id: cluster
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/cloud-native-toolkit/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
           - source: github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: namespace
         refs:
           - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: cluster_id
         moduleRef:
@@ -1067,7 +1197,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -1075,7 +1205,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_config_file_path
         moduleRef:
@@ -1083,7 +1213,7 @@ versions:
           output: config_file_path
         type: string
         description: The path to the config file for the cluster
-        default: ""
+        default: ''
         optional: true
       - name: tools_namespace
         moduleRef:
@@ -1091,7 +1221,9 @@ versions:
           output: name
           discriminator: tools
         type: string
-        description: The namespace where the tools have been deployed (where the configmap should be created)
+        description: >-
+          The namespace where the tools have been deployed (where the configmap
+          should be created)
         default: default
         optional: true
       - name: region
@@ -1101,8 +1233,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -1130,12 +1264,14 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.0.1
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [helm_release.sysdig] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [helm_release.sysdig] }
   - platforms:
       - kubernetes
       - ocp3
@@ -1144,21 +1280,21 @@ versions:
       - id: cluster
         refs:
           - source: github.com/ibm-garage-cloud/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/ibm-garage-cloud/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
       - id: namespace
         refs:
           - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: resource_group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 2.1.0"
+            version: '>= 2.1.0'
       - id: sysdig
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-sysdig
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: cluster_id
         moduleRef:
@@ -1166,7 +1302,7 @@ versions:
           output: id
         type: string
         description: The id of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_name
         moduleRef:
@@ -1174,7 +1310,7 @@ versions:
           output: name
         type: string
         description: The name of the cluster into which the sysdig instance should be bound
-        default: ""
+        default: ''
         optional: true
       - name: cluster_config_file_path
         moduleRef:
@@ -1182,7 +1318,7 @@ versions:
           output: config_file_path
         type: string
         description: The path to the config file for the cluster
-        default: ""
+        default: ''
         optional: true
       - name: tools_namespace
         moduleRef:
@@ -1190,7 +1326,9 @@ versions:
           output: name
           discriminator: tools
         type: string
-        description: The namespace where the tools have been deployed (where the configmap should be created)
+        description: >-
+          The namespace where the tools have been deployed (where the configmap
+          should be created)
         default: default
         optional: true
       - name: region
@@ -1200,8 +1338,10 @@ versions:
       - name: private_endpoint
         scope: global
         type: string
-        description: Flag indicating that the agent should be created with private endpoints
-        default: "true"
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
         optional: true
       - name: guid
         moduleRef:
@@ -1229,31 +1369,19 @@ versions:
       - name: sync
         type: string
         description: Semaphore value to sync up modules
-        default: ""
+        default: ''
         optional: true
     version: v1.0.0
     outputs:
       - name: sync
-        description: output "sync" {   value = "sysdig"   depends_on = [helm_release.sysdig] }
+        description: >-
+          output "sync" {   value = "sysdig"   depends_on =
+          [helm_release.sysdig] }
   - platforms:
       - kubernetes
       - ocp3
       - ocp4
     dependencies: []
-    #    - id: cluster
-    #      refs:
-    #        - source: github.com/ibm-garage-cloud/terraform-ibm-container-platform
-    #          version: ">= 1.7.0"
-    #        - source: github.com/ibm-garage-cloud/terraform-k8s-ocp-cluster
-    #          version: ">= 2.0.0"
-    #    - id: namespace
-    #      refs:
-    #        - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-    #          version: ">= 2.1.0"
-    #    - id: dashboard
-    #      refs:
-    #        - source: github.com/ibm-garage-cloud/terraform-k8s-dashboard
-    #          version: ">= 1.6.0"
     variables: []
     version: v0.0.1
   - platforms:
@@ -1261,19 +1389,6 @@ versions:
       - ocp3
       - ocp4
     dependencies: []
-    #    - id: cluster
-    #      refs:
-    #        - source: github.com/ibm-garage-cloud/terraform-ibm-container-platform
-    #          version: ">= 1.7.0"
-    #        - source: github.com/ibm-garage-cloud/terraform-k8s-ocp-cluster
-    #          version: ">= 2.0.0"
-    #    - id: namespace
-    #      refs:
-    #        - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-    #          version: ">= 2.1.0"
-    #    - id: dashboard
-    #      refs:
-    #        - source: github.com/ibm-garage-cloud/terraform-k8s-dashboard
-    #          version: ">= 1.6.0"
     variables: []
     version: v0.0.0
+alias: sysdig-bind
