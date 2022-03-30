@@ -1,5 +1,6 @@
 name: ibm-cloud-monitoring-bind
 alias: sysdig-bind
+registryId: cloud-native-toolkit/cloud-monitoring-bind/ibm
 type: terraform
 description: Module to bind an existing IBM Cloud Monitoring instance to a cluster
 tags:
