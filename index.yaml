@@ -80,6 +80,81 @@ versions:
           endpoints
         default: 'true'
         scope: global
+    version: v1.3.3
+    outputs:
+      - name: sync
+  - platforms:
+      - kubernetes
+      - ocp3
+      - ocp4
+    dependencies:
+      - id: cluster
+        interface: github.com/cloud-native-toolkit/automation-modules#cluster
+        refs: []
+      - id: resource_group
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
+            version: '>= 2.1.0'
+      - id: sysdig
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-cloud-monitoring
+            version: '>= 1.0.0'
+    variables:
+      - name: ibmcloud_api_key
+        type: string
+        description: Geographic location of the resource (e.g. us-south, us-east)
+        scope: global
+      - name: resource_group_name
+        type: string
+        description: Geographic location of the resource (e.g. us-south, us-east)
+        moduleRef:
+          id: resource_group
+          output: name
+      - name: region
+        type: string
+        description: Geographic location of the resource (e.g. us-south, us-east)
+        scope: global
+      - name: guid
+        type: string
+        description: The guid of the existing Sysdig instance
+        moduleRef:
+          id: sysdig
+          output: guid
+      - name: access_key
+        type: string
+        description: The access key of the existing Sysdig instance
+        moduleRef:
+          id: sysdig
+          output: access_key
+      - name: namespace
+        type: string
+        description: The namespace where the agent should be deployed
+        default: ibm-observe
+      - name: cluster_name
+        type: string
+        description: The name of the cluster into which the sysdig instance should be bound
+        default: ''
+        moduleRef:
+          id: cluster
+          output: name
+      - name: cluster_id
+        type: string
+        description: The id of the cluster into which the sysdig instance should be bound
+        default: ''
+        moduleRef:
+          id: cluster
+          output: id
+      - name: sync
+        type: string
+        description: Semaphore value to sync up modules
+        default: ''
+      - name: private_endpoint
+        type: string
+        description: >-
+          Flag indicating that the agent should be created with private
+          endpoints
+        default: 'true'
+        scope: global
     version: v1.3.2
     outputs:
       - name: sync
