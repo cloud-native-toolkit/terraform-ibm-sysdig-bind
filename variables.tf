@@ -2,6 +2,7 @@
 variable "ibmcloud_api_key" {
   type        = string
   description = "Geographic location of the resource (e.g. us-south, us-east)"
+  sensitive   = true
 }
 
 variable "resource_group_name" {
